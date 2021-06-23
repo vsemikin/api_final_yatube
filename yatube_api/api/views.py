@@ -1,11 +1,10 @@
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets, mixins
+from rest_framework import mixins, viewsets
 from rest_framework.generics import get_object_or_404
 
 from .models import Group, Post
-from .serializers import (
-    CommentSerializer, FollowSerializer, GroupSerializer, PostSerializer
-)
+from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
+                          PostSerializer)
 
 User = get_user_model()
 
@@ -30,14 +29,18 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """The function returns a queryset filtered by the post id
         from the URL."""
-        post_id = self.kwargs["post_id"]
-        post = get_object_or_404(Post, id=post_id)
+        post = self.get_post()
         return post.comments.all()
+
+    def get_post(self):
+        """The function returns the post whose id is obtained from the URL."""
+        post_id = self.kwargs['post_id']
+        return get_object_or_404(Post, id=post_id)
 
     def perform_create(self, serializer):
         """The function adds the current user and the number of the commented post
         as comment fields when creating it."""
-        serializer.save(author=self.request.user)
+        serializer.save(author=self.request.user, post=self.get_post())
 
 
 class CreateListViewSet(
@@ -59,10 +62,10 @@ class FollowViewSet(CreateListViewSet):
 
     def perform_create(self, serializer):
         """."""
-        serializer.save(following=self.request.user)
+        serializer.save(user=self.request.user)
 
 
 class GroupViewSet(CreateListViewSet):
-    """."""
+    """The class returns a list of all groups and creates a new group."""
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
