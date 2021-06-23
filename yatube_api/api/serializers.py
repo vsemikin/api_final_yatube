@@ -1,19 +1,39 @@
 from rest_framework import serializers
 
-from .models import Comment, Post
+from .models import Comment, Group, Follow, Post
 
 
 class PostSerializer(serializers.ModelSerializer):
-    author = serializers.ReadOnlyField(source='author.username')
+    """Serializer for the Post model."""
+    author = serializers.ReadOnlyField(source="author.username")
 
     class Meta:
-        fields = ('id', 'text', 'author', 'pub_date')
+        fields = ("id", "text", "author", "pub_date")
         model = Post
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.ReadOnlyField(source='author.username')
+    """Serializer for the Comment model."""
+    author = serializers.ReadOnlyField(source="author.username")
 
     class Meta:
-        fields = ('id', 'author', 'post', 'text', 'created')
+        fields = ("id", "author", "text", "created")
         model = Comment
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    """Serializer for the Follow model."""
+    user = serializers.ReadOnlyField(source="user.username")
+    following = serializers.ReadOnlyField(source="author.username")
+
+    class Meta:
+        fields = ("user", "following")
+        model = Follow
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    """Serializer for the Group model."""
+
+    class Meta:
+        fields = ("title",)
+        model = Group
