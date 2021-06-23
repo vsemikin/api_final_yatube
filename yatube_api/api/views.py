@@ -57,8 +57,9 @@ class FollowViewSet(CreateListViewSet):
 
     def get_queryset(self):
         """."""
-        user = get_object_or_404(User, username=self.request.user.username)
-        return user.following.all()
+        username_ = self.request.user.username
+        user_ = get_object_or_404(User, username=username_)
+        return user_.following.all()
 
     def perform_create(self, serializer):
         """."""

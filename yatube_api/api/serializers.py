@@ -25,7 +25,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class FollowSerializer(serializers.ModelSerializer):
     """Serializer for the Follow model."""
     user = serializers.ReadOnlyField(source="user.username")
-    following = serializers.ReadOnlyField(source="author.username")
+    following = serializers.CharField(source="following.username")
 
     class Meta:
         fields = ("user", "following")
