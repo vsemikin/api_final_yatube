@@ -56,13 +56,15 @@ class FollowViewSet(CreateListViewSet):
     serializer_class = FollowSerializer
 
     def get_queryset(self):
-        """."""
+        """The function returns a queryset containing all subscribers
+        of the current user."""
         username_ = self.request.user.username
         user_ = get_object_or_404(User, username=username_)
         return user_.following.all()
 
     def perform_create(self, serializer):
-        """."""
+        """The function passes the current user as a subscriber to the
+        specified blogger."""
         serializer.save(user=self.request.user)
 
 
