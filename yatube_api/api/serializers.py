@@ -26,7 +26,10 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class FollowSerializer(serializers.ModelSerializer):
     """Serializer for the Follow model."""
-    user = serializers.ReadOnlyField(source="user.username")
+    # user = serializers.ReadOnlyField(source="user.username")
+    user = serializers.PrimaryKeyRelatedField(
+        read_only=True, default=serializers.CurrentUserDefault()
+    )
     following = serializers.SlugRelatedField(
         slug_field="username",
         queryset=User.objects.all()
@@ -36,12 +39,12 @@ class FollowSerializer(serializers.ModelSerializer):
         fields = ("user", "following")
         model = Follow
 
-    # validators = [
-    #     UniqueTogetherValidator(
-    #         queryset=Follow.objects.all(),
-    #         fields=("user", "following")
-    #     )
-    # ]
+    validators = [
+        UniqueTogetherValidator(
+            queryset=Follow.objects.all(),
+            fields=("user_id", "following")
+        )
+    ]
 
 
 class GroupSerializer(serializers.ModelSerializer):
