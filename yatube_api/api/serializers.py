@@ -25,7 +25,6 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class FollowSerializer(serializers.ModelSerializer):
     """Serializer for the Follow model."""
-    # user = serializers.ReadOnlyField(source="user.username")
     user = serializers.CharField(
         read_only=True, default=serializers.CurrentUserDefault()
     )

@@ -15,11 +15,8 @@ User = get_user_model()
 class PostViewSet(viewsets.ModelViewSet):
     """The class returns all community posts or creates a new post or
     modifies a post."""
-    # queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
-    # filter_backends = [filters.SearchFilter]
-    # search_fields = ["group", ]
 
     def get_queryset(self):
         """The function returns a set of queries containing all the posts or
