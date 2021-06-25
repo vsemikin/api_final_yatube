@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import (TokenObtainPairView,
 from .views import CommentViewSet, FollowViewSet, GroupViewSet, PostViewSet
 
 router = DefaultRouter()
-router.register(r"posts", PostViewSet)
+router.register(r"posts", PostViewSet, basename="Post")
 router.register(
     r"posts/(?P<post_id>\d+)/comments", CommentViewSet, basename="Comment"
 )

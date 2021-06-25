@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
-from rest_framework import filters
-from rest_framework import mixins, viewsets
+from rest_framework import filters, mixins, viewsets
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
@@ -16,11 +15,21 @@ User = get_user_model()
 class PostViewSet(viewsets.ModelViewSet):
     """The class returns all community posts or creates a new post or
     modifies a post."""
-    queryset = Post.objects.all()
+    # queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
     # filter_backends = [filters.SearchFilter]
     # search_fields = ["group", ]
+
+    def get_queryset(self):
+        """The function returns a set of queries containing all the posts or
+        posts of the selected group."""
+        queryset = Post.objects.all()
+        group_id = self.request.query_params.get("group", None)
+        if group_id is not None:
+            group = get_object_or_404(Group, id=group_id)
+            queryset = group.groups.all()
+        return queryset
 
     def perform_create(self, serializer):
         """The function passes the current user as the author of the post

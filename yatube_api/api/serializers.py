@@ -7,7 +7,6 @@ from .models import Comment, Follow, Group, Post, User
 class PostSerializer(serializers.ModelSerializer):
     """Serializer for the Post model."""
     author = serializers.ReadOnlyField(source="author.username")
-    # group = serializers.HiddenField(default="serializers.GroupSerializer")
 
     class Meta:
         fields = ("id", "text", "author", "pub_date")
@@ -27,7 +26,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class FollowSerializer(serializers.ModelSerializer):
     """Serializer for the Follow model."""
     # user = serializers.ReadOnlyField(source="user.username")
-    user = serializers.PrimaryKeyRelatedField(
+    user = serializers.CharField(
         read_only=True, default=serializers.CurrentUserDefault()
     )
     following = serializers.SlugRelatedField(
@@ -38,13 +37,20 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ("user", "following")
         model = Follow
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=("user", "following")
+            )
+        ]
 
-    validators = [
-        UniqueTogetherValidator(
-            queryset=Follow.objects.all(),
-            fields=("user_id", "following")
-        )
-    ]
+    def validate(self, data):
+        """The function prohibits subscribing to yourself."""
+        if data["following"] == self.context["request"].user:
+            raise serializers.ValidationError(
+                "It is impossible to subscribe to yourself"
+            )
+        return data
 
 
 class GroupSerializer(serializers.ModelSerializer):
