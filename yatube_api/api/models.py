@@ -69,6 +69,17 @@ class Follow(models.Model):
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "following"],
+                name="unique_pair"
+            )
+            # models.CheckConstraint(
+            #     check=Follow.objects.filter(models.Q(user!=models.F("following"))),
+            #     # check=models.Q(user=user != models.F("following")),
+            #     name="impossible_subscribe_yourself"
+            # )
+        ]
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
 

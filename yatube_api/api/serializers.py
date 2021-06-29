@@ -6,7 +6,9 @@ from .models import Comment, Follow, Group, Post, User
 
 class PostSerializer(serializers.ModelSerializer):
     """Serializer for the Post model."""
-    author = serializers.ReadOnlyField(source="author.username")
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field="username"
+    )
 
     class Meta:
         fields = ("id", "text", "author", "pub_date")
@@ -15,12 +17,14 @@ class PostSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     """Serializer for the Comment model."""
-    author = serializers.ReadOnlyField(source="author.username")
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field="username"
+    )
 
     class Meta:
         fields = ("id", "author", "post", "text", "created")
         model = Comment
-        read_only_fields = ('post',)
+        read_only_fields = ("post",)
 
 
 class FollowSerializer(serializers.ModelSerializer):
@@ -39,7 +43,8 @@ class FollowSerializer(serializers.ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
-                fields=("user", "following")
+                fields=("user", "following"),
+                message="The subscriber:blogger combination must be unique!"
             )
         ]
 

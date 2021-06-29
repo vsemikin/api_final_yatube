@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import (IsAuthenticated,
@@ -15,18 +16,21 @@ User = get_user_model()
 class PostViewSet(viewsets.ModelViewSet):
     """The class returns all community posts or creates a new post or
     modifies a post."""
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ("group",)
 
-    def get_queryset(self):
-        """The function returns a set of queries containing all the posts or
-        posts of the selected group."""
-        queryset = Post.objects.all()
-        group_id = self.request.query_params.get("group", None)
-        if group_id is not None:
-            group = get_object_or_404(Group, id=group_id)
-            queryset = group.groups.all()
-        return queryset
+    # def get_queryset(self):
+    #     """The function returns a set of queries containing all the posts or
+    #     posts of the selected group."""
+    #     queryset = Post.objects.all()
+    #     group_id = self.request.query_params.get("group", None)
+    #     if group_id is not None:
+    #         group = get_object_or_404(Group, id=group_id)
+    #         queryset = group.groups.all()
+    #     return queryset
 
     def perform_create(self, serializer):
         """The function passes the current user as the author of the post
@@ -68,15 +72,15 @@ class FollowViewSet(CreateListViewSet):
     """The class returns a list of all subscribers and
     creates a subscription."""
     serializer_class = FollowSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ["user__username", ]
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("=user__username", "=following__username")
 
     def get_queryset(self):
         """The function returns a queryset containing all subscribers
         of the current user."""
-        username_ = self.request.user.username
-        user_ = get_object_or_404(User, username=username_)
-        return user_.following.all()
+        # username_ = self.request.user.username
+        # user_ = get_object_or_404(User, username=username_)
+        return self.request.user.following.all()
 
     def perform_create(self, serializer):
         """The function passes the current user as a subscriber to the
