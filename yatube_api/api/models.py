@@ -75,8 +75,9 @@ class Follow(models.Model):
                 name="unique_pair"
             )
             # models.CheckConstraint(
-            #     check=Follow.objects.filter(models.Q(user!=models.F("following"))),
-            #     # check=models.Q(user=user != models.F("following")),
+            #     check=models.Q(user=user != models.F("following")),
+            #     check=models.Q(models.F("user"), models.F("following")),
+            #     check=models.Q(user=models.F("following")),
             #     name="impossible_subscribe_yourself"
             # )
         ]
