@@ -13,12 +13,13 @@ router.register(
 router.register("follow", FollowViewSet, basename="Follow")
 router.register("group", GroupViewSet, basename="Group")
 
+token_urls = [
+    path("", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+]
 urlpatterns = [
     path("v1/", include([
         path("", include(router.urls)),
-        path("token/", include([
-            path("", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-            path("refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-        ])),
+        path("token/", include(token_urls)),
     ])),
 ]
